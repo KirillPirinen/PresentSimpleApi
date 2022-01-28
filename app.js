@@ -22,10 +22,10 @@ const groupRouter = require("./src/routes/group.router");
 const checkAuth = require('./src/middleware/checkAuth');
 const appError = require("./src/Errors/errors");
 
-app.set("cookieName", COOKIE_NAME);
+app.enable('trust proxy') 
+app.set("cookieName", 'sid'/*COOKIE_NAME*/);
 app.enable('trust proxy')
 //app.use(logger("dev"));
-//app.use("/", rootRouter);
 
 app.use(cors({ credentials: true, origin:true }));
 
@@ -35,7 +35,7 @@ app.use(express.static(path.join(PWD, "public")));
 //сессии
 const sessionParser = session({
   name: app.get("cookieName"),
-  secret: COOKIE_SECRET,
+  secret: 'dsdsd'/*COOKIE_SECRET*/,
   resave: false,
   saveUninitialized: false,
   store: new FileStore(), //new RedisStore({ client: redisClient }),

@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-const logger = require("morgan");
+//const logger = require("morgan");
 const {COOKIE_SECRET, COOKIE_NAME, PWD, REDISCLOUD_URL} = process.env;
 const redis = require("redis");
 const session = require("express-session");
@@ -24,11 +24,10 @@ const presentsRouter = require('./src/routes/presentsRouter');
 const groupRouter = require("./src/routes/group.router");
 const checkAuth = require('./src/middleware/checkAuth');
 const appError = require("./src/Errors/errors");
-const { url } = require("inspector");
 
 app.set("cookieName", COOKIE_NAME);
-
-app.use(logger("dev"));
+app.enable('trust proxy')
+//app.use(logger("dev"));
 //app.use("/", rootRouter);
 
 app.use(cors({ credentials: true, origin:true }));

@@ -23,7 +23,8 @@ const checkAuth = require('./src/middleware/checkAuth');
 const appError = require("./src/Errors/errors");
 
 //app.set("cookieName", 'sid'/*COOKIE_NAME*/);
-app.enable('trust proxy')
+app.enable('trust proxy', 1)
+app.set('trust proxy', 1)
 //app.use(logger("dev"));
 
 app.use(cors({ credentials: true, origin:true }));

@@ -3,7 +3,7 @@ const WebSocket = require('ws');
 const {app, sessionParser} = require('./app.js');
 const {chatBroadcast, chatConnect, chatDisconect, currentOnline, getMessages, addMessage, pingHandler} = require('./src/functions/broadcast.js');
 const urlParser = require('./src/functions/urlparser.js');
-const PORT = process.env.SERVER_PORT
+const PORT = process.env.PORT || 3000
 const server = createServer(app);
 
 function heartbeat() {

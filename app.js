@@ -28,7 +28,7 @@ app.set("cookieName", COOKIE_NAME);
 app.use(logger("dev"));
 //app.use("/", rootRouter);
 
-app.use(cors({ credentials: true, origin:'http://localhost:3000' }));
+app.use(cors({ credentials: true, origin:true }));
 
 app.use(express.json());
 app.use(express.static(path.join(PWD, "public")));

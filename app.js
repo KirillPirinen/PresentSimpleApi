@@ -3,12 +3,14 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const logger = require("morgan");
-const {COOKIE_SECRET, COOKIE_NAME, PWD, REDIS_DB_PASS} = process.env;
+const {COOKIE_SECRET, COOKIE_NAME, PWD, REDISCLOUD_URL} = process.env;
 const redis = require("redis");
 const session = require("express-session");
 let RedisStore = require("connect-redis")(session);
 
-let redisClient = redis.createClient(REDISCLOUD_URL);
+let redisClient = redis.createClient({
+  url:REDISCLOUD_URL
+});
 
 const authRouter = require("./src/routes/auth.router");
 const sentFormRouter = require("./src/routes/sentForm.router");
@@ -22,6 +24,7 @@ const presentsRouter = require('./src/routes/presentsRouter');
 const groupRouter = require("./src/routes/group.router");
 const checkAuth = require('./src/middleware/checkAuth');
 const appError = require("./src/Errors/errors");
+const { url } = require("inspector");
 
 app.set("cookieName", COOKIE_NAME);
 

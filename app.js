@@ -47,6 +47,7 @@ const sessionParser = session({
   key: 'presentSimple', // ключ куки (название куки)
   secret: process.env.COOKIE_SECRET, // для шифрования id сессии
   resave: true, // сессия будет сохраняться заново только при изменениях
+  proxy : true,
   saveUninitialized: false, // сохранение (или не сохранение) не инициализированной сессии
   httpOnly: true, // невозможно изменить куку с фронта
   cookie: { expires: 24 * 60 * 60e3 },

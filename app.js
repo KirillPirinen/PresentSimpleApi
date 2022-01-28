@@ -45,6 +45,7 @@ const sessionParser = session({
   //   maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
   // },
     secret : 'somesecret',
+    secureProxy: true,
     store : new FileStore(), // store works fine, sessions are stored
     key : 'sid',
     proxy : true, // add this when behind a reverse proxy, if you need secure cookies

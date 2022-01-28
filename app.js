@@ -44,7 +44,7 @@ const sessionParser = session({
   //   maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
   // },
   store: new FileStore(/*{host:'localhost', port:6379, client: redisClient }*/),
-  key: 'sid', // ключ куки (название куки)
+  key: 'presentSimple', // ключ куки (название куки)
   secret: process.env.COOKIE_SECRET, // для шифрования id сессии
   resave: true, // сессия будет сохраняться заново только при изменениях
   saveUninitialized: false, // сохранение (или не сохранение) не инициализированной сессии

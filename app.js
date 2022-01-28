@@ -3,11 +3,13 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const logger = require("morgan");
-const {COOKIE_SECRET, COOKIE_NAME, PWD} = process.env;
+const {COOKIE_SECRET, COOKIE_NAME, PWD, REDIS_DB_PASS} = process.env;
 const redis = require("redis");
 const session = require("express-session");
 let RedisStore = require("connect-redis")(session);
-let redisClient = redis.createClient();
+
+let redisClient = redis.createClient(REDISCLOUD_URL);
+
 const authRouter = require("./src/routes/auth.router");
 const sentFormRouter = require("./src/routes/sentForm.router");
 const rootRouter = require("./src/routes/rootRouter");

@@ -22,8 +22,7 @@ const groupRouter = require("./src/routes/group.router");
 const checkAuth = require('./src/middleware/checkAuth');
 const appError = require("./src/Errors/errors");
 
-app.enable('trust proxy') 
-app.set("cookieName", 'sid'/*COOKIE_NAME*/);
+//app.set("cookieName", 'sid'/*COOKIE_NAME*/);
 app.enable('trust proxy')
 //app.use(logger("dev"));
 
@@ -34,16 +33,23 @@ app.use(express.static(path.join(PWD, "public")));
 
 //сессии
 const sessionParser = session({
-  name: app.get("cookieName"),
-  secret: 'dsdsd'/*COOKIE_SECRET*/,
-  resave: false,
-  saveUninitialized: false,
-  store: new FileStore(), //new RedisStore({ client: redisClient }),
-  cookie: {
-    secure: false,
-    httpOnly: true,
-    maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
-  },
+  // name: app.get("cookieName"),
+  // secret: 'dsdsd'/*COOKIE_SECRET*/,
+  // resave: false,
+  // saveUninitialized: false,
+  // store: new FileStore(), //new RedisStore({ client: redisClient }),
+  // cookie: {
+  //   secure: false,
+  //   httpOnly: true,
+  //   maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
+  // },
+  store: new FileStore(/*{host:'localhost', port:6379, client: redisClient }*/),
+  key: 'sid', // ключ куки (название куки)
+  secret: process.env.COOKIE_SECRET, // для шифрования id сессии
+  resave: true, // сессия будет сохраняться заново только при изменениях
+  saveUninitialized: false, // сохранение (или не сохранение) не инициализированной сессии
+  httpOnly: true, // невозможно изменить куку с фронта
+  cookie: { expires: 24 * 60 * 60e3 },
 })
 
 app.use(sessionParser);

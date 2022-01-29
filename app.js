@@ -38,7 +38,7 @@ const sessionParser = session({
   store:  new FileStore(), //new RedisStore({ client: redisClient }),
   cookie: {
     sameSite: 'none',
-    secure: false,
+    secure: true,
     httpOnly: true,
     maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
   },

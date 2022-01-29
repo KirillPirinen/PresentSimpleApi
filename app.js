@@ -36,6 +36,7 @@ const sessionParser = session({
   resave: true,
   saveUninitialized: true,
   store:  new FileStore(), //new RedisStore({ client: redisClient }),
+  proxy: true,
   cookie: {
     SameSite:'none',
     secure: true,

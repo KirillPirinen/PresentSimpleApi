@@ -37,7 +37,7 @@ const sessionParser = session({
   store:  new RedisStore({ client: redisClient }),
   cookie: {
     secure: false,
-    httpOnly: true,
+    httpOnly: false,
     maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
   },
 })

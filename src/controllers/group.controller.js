@@ -32,9 +32,9 @@ const allWishes = async (req, res, next) => {
       order: [[Wish, "pricerange_id", "ASC"]],
     });
     if(wishes.user_id === req.session.user.id) return next(new appError(303, 'Просмотр собственных подарков доступен в личном кабинете'))
-    res.status(200).json(wishes)
+    return res.status(200).json(wishes)
   } catch (err) {
-    next(new Error(err.message))
+    return next(new Error(err.message))
   }
 };
 
@@ -99,11 +99,11 @@ const joinGroup = async (req, res, next) => {
       return res.json({info: "Вы успешно вступили в группу"});
 
     } else {
-      next(new appError(403, 'Достигнуто максимальное количество участников'))
+      return next(new appError(403, 'Достигнуто максимальное количество участников'))
     };
 
   } catch (error) {
-    next(new Error(error.message))
+    return next(new Error(error.message))
   }
 };
 
@@ -125,7 +125,7 @@ const getGroupInfo = async (req, res, next) => {
       if(group.Users.some(user => user.id === req.session.user.id)) return res.json(group)
       else return next(new appError(303, 'Вы не состоите в данной группе'))
     } else {
-      next(new appError(403, 'Группа не найдена'))
+     return next(new appError(403, 'Группа не найдена'))
     }
 
   } catch (error) {
@@ -188,7 +188,7 @@ const editGroup = async (req, res, next) => {
       return res.sendStatus(200)
     }
   } else {
-    next(new appError(403, 'Вы ничего не изменили'))
+    return next(new appError(403, 'Вы ничего не изменили'))
   }
 }
 
@@ -203,7 +203,7 @@ const leaveGroup = async (req, res, next) => {
 
     return res.json({info:'Вы успешно вышли из группы'})
   } catch (err) {
-    next(new Error(err.message))
+   return next(new Error(err.message))
   }
 }
 

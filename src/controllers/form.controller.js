@@ -4,14 +4,12 @@ const {checkInput} = require('../functions/validateBeforeInsert')
 const appError = require('../Errors/errors');
 const { uuid } = require('uuidv4');
 
-const searchEnd = (req, res, next) => {
-    setTimeout(()=>{
+const searchEnd = (req, res) => {
       if(res.locals.answer) {
         return res.json(res.locals.answer)
        } else {
         return res.json({info:'Ничего не найдено'})
        }
-    }, 5000)
 }
 
 const findForms = async (req, res, next) => {
@@ -34,7 +32,7 @@ const findForms = async (req, res, next) => {
       next()
 
   } catch (error) {
-    next(new Error(`Ошибка поиска:${error.message}` ))
+    return next(new Error(`Ошибка поиска:${error.message}` ))
   }
 
 }
@@ -48,7 +46,7 @@ const checkInputsMiddleware = (req, res, next) => {
     next()
 
   } else {
-    next(new appError(406, 'Вы не ввели данных для поиска'))
+    return next(new appError(406, 'Вы не ввели данных для поиска'))
   }
 }
 
@@ -71,7 +69,7 @@ const findUser = async (req, res, next) => {
       next()
   
     } catch (error) {
-      next(new Error(`Ошибка поиска:${error.message}` ))
+      return next(new Error(`Ошибка поиска:${error.message}` ))
     }
 
 }
@@ -84,10 +82,10 @@ const addNewForm = async (req, res, next) => {
       const form = await Form.create({id:uuid(), ...input, user_id:req.session.user.id});
       return res.json(form);
     } catch (error) {
-      next(new Error(`Произошла ошибка добавления:${error.message}`))
+      return next(new Error(`Произошла ошибка добавления:${error.message}`))
     }
   } else {
-    next(new appError(400, 'Вы не ввели все необходимые данные для создания анкеты'))
+    return next(new appError(400, 'Вы не ввели все необходимые данные для создания анкеты'))
   }
 };
 
@@ -97,7 +95,7 @@ const deleteForm = async (req, res, next) => {
     await Form.destroy({ where: { id } });
     res.sendStatus(200);
   } catch (error) {
-    next(new Error(error.message))
+    return next(new Error(error.message))
   }
 };
 

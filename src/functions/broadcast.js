@@ -60,7 +60,6 @@ const currentOnline = (groupid) => {
 const pingHandler = () => {
 
   const interval = setInterval(function ping() {
-    console.log('ping')
     groups.forEach((group, groupid) => group.forEach((client, clientid) => {
       if (client.isAlive === false) {
         //chatDisconect(groupid, clientid)

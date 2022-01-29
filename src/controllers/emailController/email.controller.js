@@ -27,7 +27,7 @@ module.exports = class MailController {
     if(Array.isArray(to)) {
       let timeout = 2000;
         to.forEach(email => {
-          console.log(email)
+          (email)
           setTimeout(() => {
             send(email, subject, html)
           timeout += 5000;

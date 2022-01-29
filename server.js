@@ -7,7 +7,6 @@ const PORT = process.env.PORT || 3000
 const server = createServer(app);
 
 function heartbeat() {
-  console.log('pong')
   this.isAlive = true;
 }
 

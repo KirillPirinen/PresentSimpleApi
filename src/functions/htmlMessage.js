@@ -7,8 +7,8 @@ const initiatorMessage = (friendname) => {
 const recipientMessage = (recipient) => {
   return `<h1>Ура, кто-то хочет подарить тебе подарок </h1>
   <p>${recipient.name}, пожалуйста заполни анкету, чтобы твои друзья знали что тебе подарить.</p>
-  <p>Ссылка на анкету: <a href="http://localhost:3000/sentform/${recipient.id}">ССЫЛКА</a></p>
-  <p>Подробнее о нас и о том как это работает ты можешь узнать на нашем сайте <a href="http://localhost:3000">Present Simple</a></p>
+  <p>Ссылка на анкету: <a href="https://presentsimple.web.app/sentform/${recipient.id}">ССЫЛКА</a></p>
+  <p>Подробнее о нас и о том как это работает ты можешь узнать на нашем сайте <a href="https://presentsimple.web.app">Present Simple</a></p>
   `
  }
 

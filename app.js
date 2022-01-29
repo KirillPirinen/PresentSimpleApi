@@ -22,7 +22,7 @@ const appError = require("./src/Errors/errors");
 
 app.set("cookieName", COOKIE_NAME);
 app.use(logger("dev"));
-
+app.enable('trust proxy')
 app.use(cors({ credentials: true, origin:true }));
 
 app.use(express.json());
@@ -36,8 +36,9 @@ const sessionParser = session({
   saveUninitialized: false,
   store:  new RedisStore({ client: redisClient }),
   cookie: {
+    domain: 'http://77.40.217.8',
     secure: false,
-    httpOnly: false,
+    httpOnly: true,
     maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
   },
 })

@@ -4,11 +4,10 @@ const app = express();
 const cors = require("cors");
 const logger = require("morgan");
 const {COOKIE_SECRET, COOKIE_NAME, PWD} = process.env;
-//const redis = require("redis");
+const redis = require("redis");
 const session = require("express-session");
-// let RedisStore = require("connect-redis")(session);
-// let redisClient = redis.createClient();
-const FileStore = require('session-file-store')(session);
+let RedisStore = require("connect-redis")(session);
+let redisClient = redis.createClient();
 const authRouter = require("./src/routes/auth.router");
 const sentFormRouter = require("./src/routes/sentForm.router");
 const errorHandler = require("./src/controllers/error.controller");
@@ -35,7 +34,7 @@ const sessionParser = session({
   secret: COOKIE_SECRET,
   resave: true,
   saveUninitialized: true,
-  store:  new FileStore(), //new RedisStore({ client: redisClient }),
+  store: new RedisStore({ client: redisClient }),
   proxy: true,
   cookie: {
     sameSite:'none',

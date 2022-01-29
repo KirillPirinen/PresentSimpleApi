@@ -3,7 +3,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const logger = require("morgan");
-const {COOKIE_SECRET, COOKIE_NAME, PWD} = process.env;
+const {COOKIE_SECRET, COOKIE_NAME, PWD, NODE_DEV} = process.env;
 const redis = require("redis");
 const session = require("express-session");
 let RedisStore = require("connect-redis")(session);
@@ -23,7 +23,7 @@ const appError = require("./src/Errors/errors");
 app.set("cookieName", COOKIE_NAME);
 app.use(logger("dev"));
 app.set('trust proxy')
-app.use(cors({ credentials: true, origin:'https://presentsimple.web.app' }));
+app.use(cors({ credentials: true, origin: NODE_DEV ? true : 'https://presentsimple.web.app' }));
 
 app.use(express.json());
 app.use(express.static(path.join(PWD, "public")));
@@ -37,10 +37,10 @@ const sessionParser = session({
   store: new RedisStore({ client: redisClient }),
   proxy: true,
   cookie: {
-    sameSite:'none',
-    secure: true,
+    sameSite: NODE_DEV ? 'lax' : 'none',
+    secure: NODE_DEV ? false : true,
     httpOnly: true,
-    maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY
+    maxAge: 1e3 * 86400,
   },
 })
 
@@ -65,6 +65,5 @@ app.use((req,res,next)=> {
 //обработчик ошибок
 app.use(errorHandler);
 
-//app.listen(process.env.SERVER_PORT, () => console.log('started'))
 module.exports = {app, sessionParser};
 

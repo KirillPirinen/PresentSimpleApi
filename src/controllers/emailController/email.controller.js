@@ -31,7 +31,7 @@ module.exports = class MailController {
           setTimeout(() => {
             send(email, subject, html)
           timeout += 5000;
-        });
+        }, timeout);
       })
     } else {
       return await transporter.sendMail({

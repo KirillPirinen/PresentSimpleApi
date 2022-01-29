@@ -23,7 +23,7 @@ const appError = require("./src/Errors/errors");
 
 app.set("cookieName", COOKIE_NAME);
 app.use(logger("dev"));
-app.enable('trust proxy')
+app.set('trust proxy')
 app.use(cors({ credentials: true, origin:true }));
 
 app.use(express.json());

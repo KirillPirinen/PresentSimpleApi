@@ -32,11 +32,10 @@ app.use(express.static(path.join(PWD, "public")));
 const sessionParser = session({
   name: app.get("cookieName"),
   secret: COOKIE_SECRET,
-  resave: false,
-  saveUninitialized: false,
+  resave: true,
+  saveUninitialized: true,
   store:  new RedisStore({ client: redisClient }),
   cookie: {
-    domain: 'http://77.40.217.8',
     secure: false,
     httpOnly: true,
     maxAge: 1e3 * 86400, // COOKIE'S LIFETIME — 1 DAY

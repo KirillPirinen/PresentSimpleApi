@@ -8,7 +8,7 @@ module.exports = class SentFormController {
   static checkForm = async (req, res, next) => {
     try{
       const form = await Form.findOne({
-        attributes:['id', 'name', 'lname', 'phone', 'email', 'status'],
+        attributes:['id', 'name', 'lname', 'phone', 'email', 'status', 'user_id'],
         where:{id:req.params.uuid}})
 
       if(form?.status) {
@@ -48,6 +48,7 @@ module.exports = class SentFormController {
         await Form.update({status:false, isActive:true}, {where:{id:res.locals.guest.id}})
         
         //уведомляем инициатора
+        console.log('ФОРМА', res.locals.guest)
         User.findOne({where:{id:res.locals.guest.user_id}}).then(formInitiator => {
           const html = initiatorMessage(res.locals.guest.name);
           MailController.sendEmail(formInitiator.email, "Отправленная анкета заполнена", html)

@@ -1,7 +1,8 @@
 const {User, Sequelize:{Op}} = require('../../db/models');
 const appError = require('../Errors/errors');
 const { checkInput } = require('../functions/validateBeforeInsert');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const deleteUploadedFile = require('../functions/deleteFile');
 
 module.exports = class userController {
   static editUserData = async (req, res, next) => {
@@ -17,7 +18,15 @@ module.exports = class userController {
 
         const avatar = `uploads/${req.file.filename}`;
 
-        await User.update({avatar}, {where:{id:req.session.user.id}})
+        const user = await User.findByPk(req.session.user.id)
+        
+        const prevAvatar = user.avatar
+        
+        user.avatar = avatar
+        
+        await user.save()
+        
+        deleteUploadedFile(prevAvatar)
 
         return res.json({avatar})
 

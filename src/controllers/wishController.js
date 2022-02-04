@@ -1,6 +1,6 @@
-const { defaults } = require('pg');
 const { User, Form, Present, WishPhoto, Wish, Wishlist, Group } = require('../../db/models');
 const appError = require('../Errors/errors');
+const deleteUploadedFile = require('../functions/deleteFile');
 const {ownerToggleStatusWish, giverToggleStatusWish} = require('../functions/mailing');
 const getRange = require('../functions/rangeIdentifier');
 const { checkInput } = require('../functions/validateBeforeInsert');
@@ -71,12 +71,12 @@ const addNewWish = async (req, res, next) => {
       newWish.dataValues.WishPhoto = wishPhoto;
     }
 
-    res.json(newWish);
+    return res.json(newWish);
     } else {
-      next(new appError(400, "Не заполнены необходимые поля"));
+      return next(new appError(400, "Не заполнены необходимые поля"));
     }
   } catch (error) {
-    next(new Error(error.message))
+    return next(new Error(error.message))
   }
 };
 
@@ -105,8 +105,10 @@ const editWish = async (req, res, next) => {
       const photo = await WishPhoto.findOrCreate({defaults:{wish_id:id, image}, where: { wish_id:id }})
 
       if(!photo[1]) {
+        const prevImage = photo[0].image
         photo[0].image = image 
         await photo[0].save()
+        deleteUploadedFile(prevImage)
       }
 
       updatedWish.dataValues.WishPhoto = photo[0]
@@ -119,27 +121,47 @@ const editWish = async (req, res, next) => {
       const photo = await WishPhoto.findOrCreate({defaults:{wish_id:id, image}, where: { wish_id:id }})
 
       if(!photo[1]) {
+        const prevImage = photo[0].image
         photo[0].image = image 
         await photo[0].save()
+        deleteUploadedFile(prevImage)
       }
 
       res.status(206).json(photo[0]);
 
     } else {
-      next(new appError(400, "Поля не могут быть пустыми"))
+      return next(new appError(400, "Поля не могут быть пустыми"))
     }
   } catch (error) {
-    next(new Error(error.message))
+    return next(new Error(error.message))
   }
 };
 
 const deleteWish = async (req, res, next) => {
   try {
     const id = req.params.id;
-    await Wish.destroy({ where: { id } });
+
+    const wish = await Wish.findByPk(id, {attributes:['id'], include:[
+      {model:WishPhoto, attributes:['image']},
+      {model:Wishlist, attributes:['user_id']}
+    ]});
+
+    if(req.session.user.id !== wish.Wishlist.user_id) return next(new appError(403, 'Вы не можете удалить чужое желание'))
+
+    let image;
+
+    if(wish.WishPhoto) {
+      image = wish.WishPhoto.image
+    }
+
+    await wish.destroy()
+
     res.sendStatus(200);
+    
+    if(image) deleteUploadedFile(image)
+
   } catch (error) {
-    next(new Error(error.message))
+    return next(new Error(error.message))
   }
 };
 

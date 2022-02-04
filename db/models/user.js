@@ -2,13 +2,9 @@
 const {
   Model
 } = require('sequelize');
+const deleteUploadedFile = require('../../src/functions/deleteFile');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate({Wish, Wishlist, Form, Present, Group, UserGroup, ResetPassword, Message}) {
       this.hasOne(Wishlist, {foreignKey:"user_id"})
       this.hasMany(Form, {foreignKey:"user_id"})
@@ -45,7 +41,8 @@ module.exports = (sequelize, DataTypes) => {
       allowNull:false
     },
     avatar: DataTypes.STRING
-  }, {
+  }, 
+  {
     sequelize,
     modelName: 'User',
   });

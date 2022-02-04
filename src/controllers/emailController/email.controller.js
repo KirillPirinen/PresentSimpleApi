@@ -1,4 +1,4 @@
-"use strict";
+"use strict"
 require('dotenv').config();
 const {MAIL_PASS, MAIL_USER} = process.env;
 

@@ -1,10 +1,12 @@
-const fs = require('fs').promises
+const fs = require('fs')
 const path = require('path')
 
 const deleteUploadedFile = (filename) => {
-    fs.unlink(path.join(process.env.PWD, '/public/', filename)).catch(err => {
-      console.error(err)
-    })
+    setTimeout(() => {
+      fs.unlink(path.join(process.env.PWD, '/public/', filename), (err) => {
+        console.log(err)
+      })
+    }, 0);
 }
 
 module.exports = deleteUploadedFile;

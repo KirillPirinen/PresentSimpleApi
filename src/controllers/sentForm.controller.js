@@ -48,7 +48,6 @@ module.exports = class SentFormController {
         await Form.update({status:false, isActive:true}, {where:{id:res.locals.guest.id}})
         
         //уведомляем инициатора
-        console.log('ФОРМА', res.locals.guest)
         User.findOne({where:{id:res.locals.guest.user_id}}).then(formInitiator => {
           const html = initiatorMessage(res.locals.guest.name);
           MailController.sendEmail(formInitiator.email, "Отправленная анкета заполнена", html)

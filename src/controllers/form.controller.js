@@ -2,7 +2,7 @@ const { User, Form, Sequelize } = require("../../db/models");
 const {Op} = Sequelize;
 const {checkInput} = require('../functions/validateBeforeInsert')
 const appError = require('../Errors/errors');
-const { uuid } = require('uuidv4');
+const { v4 } = require('uuid');
 
 const searchEnd = (req, res) => {
       if(res.locals.answer) {
@@ -79,7 +79,7 @@ const addNewForm = async (req, res, next) => {
   if (input) {
     if(req.body.phone) input.phone = req.body.phone
     try {
-      const form = await Form.create({id:uuid(), ...input, user_id:req.session.user.id});
+      const form = await Form.create({id:v4(), ...input, user_id:req.session.user.id});
       return res.json(form);
     } catch (error) {
       return next(new Error(`Произошла ошибка добавления:${error.message}`))

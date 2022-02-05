@@ -35,13 +35,13 @@ module.exports = class userController {
         if(input) {
 
           if(input.hasOwnProperty('phone')) {
-            input.phone = input.phone.slice(1)
-            if(await User.findOne({where:{ phone: { [Op.like]: `%${input.phone}` }}})) {
+            if(input.phone.length !== 11) return next(new appError(411, "Телефон должен быть длиной 11 символов"));
+            if(await User.findOne({where:{ phone: { [Op.like]: `%${input.phone.slice(1)}` }}})) {
               return next(new appError(403, 'Пользователь с таким телефоном уже существует'))
             }
           }
 
-          const user = await User.findOne({where:{id:req.session.user.id}})
+          const user = await User.findByPk(req.session.user.id)
         
           Object.keys(input).forEach(field => {
             user[field] = input[field]

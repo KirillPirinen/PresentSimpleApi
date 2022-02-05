@@ -2,7 +2,7 @@
 const {
   Model
 } = require('sequelize');
-const deleteUploadedFile = require('../../src/functions/deleteFile');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate({Wish, Wishlist, Form, Present, Group, UserGroup, ResetPassword, Message}) {
@@ -27,7 +27,6 @@ module.exports = (sequelize, DataTypes) => {
         args: 11,
         msg: "Phone number should be 11 symbols"
       },
-        isNumeric:true
       }
     },
     email: {

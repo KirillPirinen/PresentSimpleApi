@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
   };
   Wish.init({
     title: DataTypes.STRING,
-    description: DataTypes.STRING,
+    description: DataTypes.TEXT,
     isBinded: DataTypes.BOOLEAN,
     user_id: {
       defaultValue:null,

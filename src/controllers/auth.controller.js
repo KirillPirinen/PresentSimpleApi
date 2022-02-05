@@ -5,7 +5,7 @@ const { checkInput } = require("../functions/validateBeforeInsert");
 const appError = require("../Errors/errors");
 const MailController = require("./emailController/email.controller");
 const { changePassword } = require("../functions/htmlResetPassword");
-const { uuid } = require("uuidv4");
+const { v4 } = require('uuid');
 const {OAuth2Client} = require("google-auth-library");
 const stringGenerator = require('../functions/stringGenerator')
 
@@ -89,16 +89,16 @@ const signUp = async (req, res, next) => {
     ["password", "email", "name", "lname"],
     true
   );
-
+  
   if (input) {
     //если инпут валиден
-    input.phone = req.body.phone.slice(1) || null;
+    input.phone = req.body.phone?.trim() || null;
     try {
       const personInDataBase = await User.findOne({
         where: {
           [Op.or]: [
             { email: { [Op.like]: input.email } },
-            { phone: { [Op.like]: `%${input.phone}` } },
+            { phone: { [Op.like]: `%${input.phone?.slice(1)}` } },
           ],
         },
       });
@@ -117,8 +117,10 @@ const signUp = async (req, res, next) => {
       return next(new Error(err));
     }
     //создаём пользователя
-    if (input.phone && input.phone.length !== 11)
+    if (input.phone && input.phone.length !== 11){
       return next(new appError(411, "Телефон должен быть длиной 11 символов"));
+    }
+      
     try {
       let { email, phone, password, lname, name } = input;
       const hashPassword = await bcrypt.hash(password, 4);
@@ -210,7 +212,7 @@ const checkEmail = async (req, res, next) => {
     if (!user) {
       return next(new appError(403, 'Пользователя с указанной почтой не существует'))
     } else {
-      const link = await ResetPassword.create({ id: uuid(), user_id: user.id });
+      const link = await ResetPassword.create({ id: v4(), user_id: user.id });
       const time = 1e3 * 86400;
       const html = changePassword(user, link.id, time);
       

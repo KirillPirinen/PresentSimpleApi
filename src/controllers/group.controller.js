@@ -115,9 +115,12 @@ const getGroupInfo = async (req, res, next) => {
       {model:User, through:{attributes:[]}, attributes: ['name', 'lname', 'id', 'email', 'avatar'],
       },
       {model:Wish, 
-        include:{model:Wishlist, attributes:['id'],
-          include:{model:User, attributes:['name', 'lname', 'id', 'email', 'avatar']}
-        }
+        include:[
+          {model:Wishlist, attributes:['id'],
+            include:{model:User, attributes:['name', 'lname', 'id', 'email', 'avatar']}
+          },
+        {model:WishPhoto, attributes:['image']},
+      ]
       }
     ]})
 

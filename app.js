@@ -23,7 +23,7 @@ const appError = require("./src/Errors/errors");
 app.set("cookieName", COOKIE_NAME);
 app.use(logger("dev"));
 app.set('trust proxy')
-app.use(cors({ credentials: true, origin: NODE_ENV === 'development' ? true : 'https://presentsimple.web.app' }));
+app.use(cors({ credentials: true, origin: NODE_ENV === 'development' ? true : ['https://presentsimple.web.app', 'https://easy2give.ru'] }));
 
 app.use(express.json());
 app.use(express.static(path.join(PWD, "public")));

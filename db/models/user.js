@@ -39,7 +39,8 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull:false
     },
-    avatar: DataTypes.STRING
+    avatar: DataTypes.STRING,
+    isConfirmed: DataTypes.BOOLEAN
   }, 
   {
     sequelize,

@@ -1,5 +1,5 @@
 const bcrypt = require("bcrypt");
-const { User, Sequelize, Wishlist, ResetPassword } = require("../../db/models");
+const { User, Sequelize, Wishlist, ResetPassword, sequelize } = require("../../db/models");
 const Op = Sequelize.Op;
 const { checkInput } = require("../functions/validateBeforeInsert");
 const appError = require("../Errors/errors");
@@ -7,7 +7,9 @@ const MailController = require("./emailController/email.controller");
 const { changePassword } = require("../functions/htmlResetPassword");
 const { v4 } = require('uuid');
 const {OAuth2Client} = require("google-auth-library");
-const stringGenerator = require('../functions/stringGenerator')
+const stringGenerator = require('../functions/stringGenerator');
+const { activationMessage } = require("../functions/htmlMessage");
+const { app } = require("../../app");
 
 const googleClient = new OAuth2Client({
   clientId: process.env.GOOGLE_CLIENT_ID
@@ -53,18 +55,22 @@ const googleAuth = async (req, res, next) => {
     try {
       const randomPass = stringGenerator(5)
       const hashPassword = await bcrypt.hash(randomPass, 4);
-      const newUser = await User.create({
-        name,
-        lname,
-        avatar,
-        email,
-        password: hashPassword,
-      });
 
+      const newUser  = await sequelize.transaction(async (t) => {
+        const newUser = await User.create({
+          name,
+          lname,
+          avatar,
+          email,
+          isConfirmed:true,
+          password: hashPassword,
+        });
+        await newUser.createWishlist({}, { transaction: t })
+        return newUser
+      })
+      
       const html = `<p>Ваш пароль врмененный пароль: <b>${randomPass}</b>, просим Вас сменить его как можно скорее</p>`
-      await MailController.sendEmail(email, "Ваш пароль от сервиса Present Simple", html)
-
-      const wishlist = await Wishlist.create({user_id:newUser.id})
+      MailController.sendEmail(email, "Ваш пароль от сервиса Present Simple", html)
 
       req.session.user = {
         id: newUser.id,
@@ -124,15 +130,19 @@ const signUp = async (req, res, next) => {
     try {
       let { email, phone, password, lname, name } = input;
       const hashPassword = await bcrypt.hash(password, 4);
-      const newUser = await User.create({
-        name,
-        lname,
-        phone,
-        email,
-        password: hashPassword,
-      });
-
-      const wishlist = await Wishlist.create({user_id:newUser.id})
+      
+      const confirmLink = await sequelize.transaction(async (t) => {
+        const newUser = await User.create({
+          name,
+          lname,
+          phone,
+          email,
+          password: hashPassword,
+        }, { transaction: t });
+        const confirmLink = await newUser.createResetPassword({id:v4()}, { transaction: t })
+        await newUser.createWishlist({}, { transaction: t })
+        return confirmLink
+      })
 
       req.session.user = {
         id: newUser.id,
@@ -140,9 +150,13 @@ const signUp = async (req, res, next) => {
         lname: newUser.lname,
       };
 
-      return res.json({
-        id: newUser.id, name: newUser.name, lname:newUser.lname
-      });
+      const info = await MailController.sendEmail(email, "Активация аккаунта", activationMessage(confirmLink.id))
+
+      if(info.hasOwnProperty('accepted')) {
+        return res.json({info:`Cсылка для активации аккауна успешно отправлена на почтый ящик ${email}`})
+      } else {
+        return next(new appError(400, `Ошибка отправки на почту ${email}, проверьте корректность адреса`))
+      }
 
     } catch (error) {
       return next(new appError(404, error.message))
@@ -284,6 +298,46 @@ const checkLink = async (req, res, next) => {
   }
 }
 
+const confirmEmail = async (req, res, next) => {
+  const {uuid} = req.params;
+
+  try {
+    const confirmLink = await ResetPassword.findByPk(uuid)
+    if(confirmLink) {
+
+      const isUpdated = await User.update({isConfirmed:true}, {where: {
+        id:confirmLink.user_id
+      }, returning: true })
+
+      if(isUpdated[0]) {
+          
+        const newUser = isUpdated[1]
+
+        req.session.user = {
+          id: newUser.id,
+          name: newUser.name,
+          lname: newUser.lname,
+        };
+
+        confirmLink.destroy()
+
+        return res.json({
+          id: newUser.id, name: newUser.name, lname:newUser.lname
+        });
+
+      } else {
+        return next(new appError(403, 'Ошибка активации, попробуйте ещё раз'))
+      }
+      
+    } else {
+      return next(new appError(403, 'Ссылка активации не найдена'))
+    }
+
+  } catch (err) {
+    return next(new Error(error.message))
+  }
+}
+
 module.exports = {
   signIn,
   signOut,
@@ -292,5 +346,6 @@ module.exports = {
   checkEmail,
   ResetPasswordBack,
   googleAuth,
-  checkLink
+  checkLink,
+  confirmEmail
 };

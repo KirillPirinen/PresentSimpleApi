@@ -146,7 +146,7 @@ const signUp = async (req, res, next) => {
               return res.json({info:`Cсылка для активации аккауна успешно отправлена на почтовый ящик ${email}`})
             } else {
               await t.rollback()
-              return next(new appError(400, `Ошибка отправки на почту ${email}, проверьте корректность адреса`))
+              return next(new appError(400, `Ошибка отправки на почту ${email}, проверьте корректность адреса и попробуйте ещё раз`))
             }
 
           } catch (err) {

@@ -151,12 +151,12 @@ const signUp = async (req, res, next) => {
 
           } catch (err) {
             await t.rollback()
-            return next(new error(err.message))
+            return next(new Error(err.message))
           }
 
         } catch (err) {
           await t.rollback()
-          return next(new error(err.message))
+          return next(new Error(err.message))
         }
 
     } catch (error) {

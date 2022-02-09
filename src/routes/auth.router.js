@@ -12,6 +12,6 @@ authRouter.post('/checkemail', authController.checkEmail)
 authRouter.get('/resetpassword/:uuid', authController.checkLink)
 authRouter.post('/resetpassword', authController.ResetPasswordBack)
 authRouter.post('/google', authController.googleAuth)
-authRouter.get('/activation:uuid', authController.confirmEmail)
+authRouter.get('/activation/:uuid', authController.confirmEmail)
 
 module.exports = authRouter

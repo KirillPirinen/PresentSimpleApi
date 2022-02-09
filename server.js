@@ -101,4 +101,4 @@ wss.on('connection', (ws, request) => {
   });
 });
 
-server.listen(PORT, () => console.log(`Server has been started ${PORT}`));
+server.listen(PORT, () => console.log(`Server has been started ${PORT}, Enviroment ${process.env.NODE_ENV}`));

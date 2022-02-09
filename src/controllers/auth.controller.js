@@ -131,32 +131,33 @@ const signUp = async (req, res, next) => {
       let { email, phone, password, lname, name } = input;
       const hashPassword = await bcrypt.hash(password, 4);
       
-      const confirmLink = await sequelize.transaction(async (t) => {
-        const newUser = await User.create({
-          name,
-          lname,
-          phone,
-          email,
-          password: hashPassword,
-        }, { transaction: t });
-        const confirmLink = await newUser.createResetPassword({id:v4()}, { transaction: t })
-        await newUser.createWishlist({}, { transaction: t })
-        return confirmLink
-      })
+      const t = await sequelize.transaction()
 
-      req.session.user = {
-        id: newUser.id,
-        name: newUser.name,
-        lname: newUser.lname,
-      };
+        try {
+          const newUser = await User.create({name,lname,phone,email,password: hashPassword}, { transaction: t });
+          const confirmLink = await newUser.createResetPassword({id:v4()}, { transaction: t })
+          await newUser.createWishlist({}, { transaction: t })
 
-      const info = await MailController.sendEmail(email, "Активация аккаунта", activationMessage(confirmLink.id))
+          try {
+            const info = await MailController.sendEmail(email, "Активация аккаунта", activationMessage(confirmLink.id))
 
-      if(info.hasOwnProperty('accepted')) {
-        return res.json({info:`Cсылка для активации аккауна успешно отправлена на почтый ящик ${email}`})
-      } else {
-        return next(new appError(400, `Ошибка отправки на почту ${email}, проверьте корректность адреса`))
-      }
+            if(info.hasOwnProperty('accepted')) {
+              await t.commit()
+              return res.json({info:`Cсылка для активации аккауна успешно отправлена на почтовый ящик ${email}`})
+            } else {
+              await t.rollback()
+              return next(new appError(400, `Ошибка отправки на почту ${email}, проверьте корректность адреса`))
+            }
+
+          } catch (err) {
+            await t.rollback()
+            return next(new error(err.message))
+          }
+
+        } catch (err) {
+          await t.rollback()
+          return next(new error(err.message))
+        }
 
     } catch (error) {
       return next(new appError(404, error.message))
@@ -175,6 +176,7 @@ const signIn = async (req, res, next) => {
     try {
       const currentUser = await User.findOne({ where: { email } });
       if (currentUser) {
+        if(!currentUser.isConfirmed) return next(new appError(403, 'Аккаунт неактивен, проверьте почту и активируйте его по ссылке'))
         if (await bcrypt.compare(password, currentUser.password)) {
           req.session.user = {
             id: currentUser.id,
@@ -299,42 +301,39 @@ const checkLink = async (req, res, next) => {
 }
 
 const confirmEmail = async (req, res, next) => {
-  const {uuid} = req.params;
+  const { uuid } = req.params;
 
   try {
     const confirmLink = await ResetPassword.findByPk(uuid)
-    if(confirmLink) {
 
-      const isUpdated = await User.update({isConfirmed:true}, {where: {
+    if(!confirmLink) return next(new appError(403, 'Ссылка активации не найдена'))
+
+      const [isUpdated, updatedArr] = await User.update({isConfirmed:true}, {where: {
         id:confirmLink.user_id
       }, returning: true })
 
-      if(isUpdated[0]) {
-          
-        const newUser = isUpdated[1]
+    if(isUpdated) {
+        const [confirmedUser] = updatedArr;
 
         req.session.user = {
-          id: newUser.id,
-          name: newUser.name,
-          lname: newUser.lname,
+          id: confirmedUser.id,
+          name: confirmedUser.name,
+          lname: confirmedUser.lname,
         };
 
         confirmLink.destroy()
 
         return res.json({
-          id: newUser.id, name: newUser.name, lname:newUser.lname
+          id: confirmedUser.id, name: confirmedUser.name, lname:confirmedUser.lname,
+          info:'Аккаунт успешно активирован'
         });
-
-      } else {
-        return next(new appError(403, 'Ошибка активации, попробуйте ещё раз'))
-      }
       
     } else {
-      return next(new appError(403, 'Ссылка активации не найдена'))
+      return next(new appError(403, 'Ошибка активации, попробуйте ещё раз'))
     }
 
   } catch (err) {
-    return next(new Error(error.message))
+    return next(new Error(err.message))
   }
 }
 

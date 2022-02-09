@@ -1,4 +1,4 @@
-const host = process.env.NODE_ENV === 'development' ? 'https://easy2give.ru' : 'http://localhost:3000'
+const host = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://easy2give.ru';
 
 const initiatorMessage = (friendname) => {
  return `<h1>Ура, ваш друг ${friendname} заполнил анкету</h1>
@@ -16,7 +16,7 @@ const recipientMessage = (recipient) => {
 
  const activationMessage = (uuid) => {
   return `<h1>Активируйте свой аккаунт</h1>
-  <p>Для активации вашего аккаунта перейдите по ссылке: <a href="${host}/api/v1/auth/activation/${uuid}">ССЫЛКА</a></p>
+  <p>Для активации вашего аккаунта перейдите по ссылке: <a href="${host}/activation/${uuid}">ССЫЛКА</a></p>
   `
  }
 

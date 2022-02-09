@@ -33,6 +33,10 @@ module.exports = {
         allowNull:true,
         type: Sequelize.STRING
       },
+      isConfirmed: {
+        type:Sequelize.BOOLEAN,
+        defaultValue:false,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE

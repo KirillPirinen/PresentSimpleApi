@@ -1,16 +1,16 @@
 "use strict"
 require('dotenv').config();
-const {MAIL_PASS, MAIL_USER} = process.env;
+const {MAIL_PASS, MAIL_USER, MAIL_SMTP} = process.env;
 
 const nodemailer = require("nodemailer");
 
 module.exports = class MailController {
   static sendEmail = async (to, subject, html) => {
     let transporter = nodemailer.createTransport({
-      service:"Mail.ru",
-      host: "smtp.mail.ru",
+      service:"Godaddy",
+      host: MAIL_SMTP,
+      secureConnection: true,
       port: 465,
-      secure: true,
       auth: {user: MAIL_USER,pass: MAIL_PASS},
     });
 

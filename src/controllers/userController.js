@@ -11,7 +11,7 @@ module.exports = class userController {
         const input = checkInput(req.body, ['password'], true)
         if(input) {
           const hashPassword = await bcrypt.hash(input.password, 4);
-          await User.update({password:hashPassword}, {where:{id:req.session.user.id}})
+          await ({password:hashPassword}, {where:{id:req.session.user.id}})
           return res.status(202).json({info:'Пароль успешно изменён'})
         }
       } else if (req.file) {

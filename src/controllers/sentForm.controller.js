@@ -49,7 +49,7 @@ module.exports = class SentFormController {
         
         //уведомляем инициатора
         User.findOne({where:{id:res.locals.guest.user_id}}).then(formInitiator => {
-          const html = initiatorMessage(res.locals.guest.name);
+          const html = initiatorMessage(res.locals.guest);
           MailController.sendEmail(formInitiator.email, "Отправленная анкета заполнена", html)
         }).catch(err => console.error(err))
         

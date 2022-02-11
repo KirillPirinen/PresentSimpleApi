@@ -4,11 +4,10 @@ const Op = Sequelize.Op;
 const { checkInput } = require("../functions/validateBeforeInsert");
 const appError = require("../Errors/errors");
 const MailController = require("./emailController/email.controller");
-const { changePassword } = require("../functions/htmlResetPassword");
 const { v4 } = require('uuid');
 const {OAuth2Client} = require("google-auth-library");
 const stringGenerator = require('../functions/stringGenerator');
-const { activationMessage } = require("../functions/htmlMessage");
+const { activationMessage, googleSighnUp, changePassword } = require("../functions/htmlMessage");
 const { app } = require("../../app");
 
 const googleClient = new OAuth2Client({
@@ -69,8 +68,8 @@ const googleAuth = async (req, res, next) => {
         return newUser
       })
       
-      const html = `<p>Ваш пароль врмененный пароль: <b>${randomPass}</b>, просим Вас сменить его как можно скорее</p>`
-      MailController.sendEmail(email, "Ваш пароль от сервиса Present Simple", html)
+      const html = googleSighnUp(randomPass)
+      MailController.sendEmail(email, "Ваш пароль от сервиса easy2give", html)
 
       req.session.user = {
         id: newUser.id,
